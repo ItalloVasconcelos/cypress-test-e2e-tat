@@ -1,0 +1,57 @@
+#Pipeline de integração contínua
+name: ci
+# Ele é disparado quando tem um "push" -> branch -> main ou quando houver um pull request
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+#Trabalhos são steps que o ci vai fazer
+jobs:
+#Primeiro trabalho vai ser usar o eslint
+  eslint:
+    runs-on: ubuntu-latest
+#Seguintes passos:
+    steps:
+    #1. Usar github checkout
+    - uses: actions/checkout@v2
+    #2. Vai instalar o modulos com npm install (Todos os que estão em package.json)
+    - name: Install modules
+      run: npm install
+    #3. Executa a ação de rodar o código
+    - name: Run ESLint
+      run: npm run lint
+  cypress-tests-desktop:
+  #Needs, significa que só parte para a proxima etapa se a etapa anterior (no caso eslint) tiver dado certo.
+    needs: eslint
+    runs-on: ubuntu-latest
+    container: cypress/browsers:node12.18.3-chrome87-ff82
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run end-to-end tests on desktop viewport 🧪
+        uses: cypress-io/github-action@v2
+        env:
+          CYPRESS_USER_EMAIL: ${{ secrets.CYPRESS_USER_EMAIL }}
+          CYPRESS_USER_PASSWORD: ${{ secrets.CYPRESS_USER_PASSWORD }}
+          CYPRESS_MAILOSAUR_SERVER_ID: ${{ secrets.CYPRESS_MAILOSAUR_SERVER_ID }}
+          CYPRESS_MAILOSAUR_API_KEY: ${{ secrets.CYPRESS_MAILOSAUR_API_KEY }}
+        with:
+          command: npm test
+  cypress-tests-tablet:
+    needs: eslint
+    runs-on: ubuntu-latest
+    container: cypress/browsers:node12.18.3-chrome87-ff82
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run end-to-end tests on tablet viewport 🧪
+        uses: cypress-io/github-action@v2
+        env:
+          CYPRESS_USER_EMAIL: ${{ secrets.CYPRESS_USER_EMAIL }}
+          CYPRESS_USER_PASSWORD: ${{ secrets.CYPRESS_USER_PASSWORD }}
+        with:
+          command: npm run test:tablet
