@@ -4,6 +4,7 @@
   "defaultCommandTimeout": 50000,
   "chromeWebSecurity": false,
   "experimentalStudio": true,
+  "projectId": "zr6k9a",
   "env": {
     "viewportWidthBreakpoint": 768
   }
