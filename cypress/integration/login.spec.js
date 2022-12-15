@@ -1,3 +1,4 @@
+/// <reference path="../support/commands.d.ts" />
 it('successfully logs in', () => {
   //Pega o sistema criado.
   cy.intercept('GET', '**/notes').as('getNotes')
